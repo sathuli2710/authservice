@@ -1,13 +1,12 @@
 package com.codelad.authservice.entities;
 
-
 import com.codelad.authservice.ApplicationConstants;
+import com.codelad.authservice.utils.VerificationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -40,8 +39,9 @@ public class UserEntity {
     private String lastName;
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
-    @Column(name = "is_verified")
-    private boolean isVerified;
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "verification_status", columnDefinition = "SMALLINT")
+    private VerificationStatus verificationStatus;
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
     @Column(name = "updated_at")
@@ -49,11 +49,9 @@ public class UserEntity {
 
     @PrePersist
     public void setDefaultValues(){
-        if(Objects.isNull(uid)){
-            uid = UUID.fromString(getUsername()+getUsername());
-        }
-        if(Objects.isNull(isVerified)){
-            isVerified = ApplicationConstants.IS_VERIFIED_DEFAULT;
+        uid = UUID.randomUUID();
+        if(Objects.isNull(verificationStatus)){
+            verificationStatus = VerificationStatus.not_verified;
         }
         createdAt = Timestamp.from(Instant.now());
     }
