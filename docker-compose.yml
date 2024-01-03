@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  auth:
+    image: postgres:14.7
+    container_name: auth_service
+    environment:
+      POSTGRES_USER: ${AUTH_UNAME}
+      POSTGRES_PASSWORD: ${AUTH_RPASS}
+      POSTGRES_DB: ${AUTH_DBNAME}
+    ports:
+      - '5333:5432'
+    volumes:
+      - /tmp/auth_data:/var/lib/postgresql/data
