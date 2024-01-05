@@ -9,7 +9,7 @@ public enum VerificationStatus {
         this.value = value;
     }
 
-    public int getValue() {
+    public short getValue() {
         return value;
     }
 
