@@ -14,8 +14,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUid(Long uid);
     Optional<UserEntity> findByUsername(String username);
     Optional<UserEntity> findByEmail(String email);
-    @Query(value = "CREATE SEQUENCE IF NOT EXISTS users_inner_seq START WITH 1 INCREMENT BY 1", nativeQuery = true)
-    void createInnerSequence();
     @Query(value = "SELECT nextval('users_inner_seq')", nativeQuery = true)
     int getInnerSequenceNextValue();
 }
