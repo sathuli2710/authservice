@@ -53,8 +53,8 @@ public class JWTServiceImplementation implements JWTService {
     }
 
     @Override
-    public Integer extractUid(String token){
-        return Integer.parseInt(extractClaims(token, Claims::getSubject));
+    public Long extractUid(String token){
+        return Long.parseLong(extractClaims(token, Claims::getSubject));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class JWTServiceImplementation implements JWTService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails){
-        final Integer uidFromToken = extractUid(token);
+        final Long uidFromToken = extractUid(token);
         return uidFromToken.toString().equals(((UserEntity) userDetails).getUid().toString()) && !isExpired(token);
     }
 

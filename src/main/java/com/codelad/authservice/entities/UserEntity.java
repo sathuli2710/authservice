@@ -1,14 +1,13 @@
 package com.codelad.authservice.entities;
 
-import com.codelad.authservice.ApplicationConstants;
 import com.codelad.authservice.utils.VerificationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -18,13 +17,13 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SequenceGenerator(name="users_sequence", initialValue = 1, allocationSize = 1)
 @Entity
 @Table(name="users")
 public class UserEntity implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="users_sequence")
-    private Integer uid;
+    @GeneratedValue(generator = "custom_uid_sequence_generator")
+    @GenericGenerator(name = "custom_uid_sequence_generator", strategy = "com.codelad.authservice.utils.CustomUidSequenceGenerator")
+    private Long uid;
     @Column(unique = true, nullable = false)
     private String username;
     @Column(unique = true, nullable = false)
@@ -49,7 +48,6 @@ public class UserEntity implements UserDetails {
 
     @PrePersist
     public void setDefaultValues(){
-//        uuid = UUID.randomUUID();
         if(Objects.isNull(verificationStatus)){
             verificationStatus = VerificationStatus.not_verified;
         }

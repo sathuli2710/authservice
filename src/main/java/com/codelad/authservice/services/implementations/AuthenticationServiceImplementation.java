@@ -26,6 +26,7 @@ public class AuthenticationServiceImplementation implements AuthenticationServic
     @Override
     public String signup(UserDto userDto) throws Exception {
         UserEntity userEntity = userService.createUser(userDto);
+        System.out.println(userEntity.toString());
         return jwtService.generateToken(userEntity);
     }
     @Override

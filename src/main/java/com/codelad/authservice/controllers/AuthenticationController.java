@@ -60,7 +60,6 @@ public class AuthenticationController {
             String signinToken = authenticationService.signin(signinDto);
             return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "Successfully signed in", signinToken, null), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println("Error Anna");
             return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.UNAUTHORIZED.value(), "Bad credentials", null, e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }

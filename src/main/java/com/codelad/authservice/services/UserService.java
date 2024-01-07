@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService {
     UserDetailsService userDetailsService();
-    UserDetails getUserByUid(Integer uid) throws UsernameNotFoundException;
+    UserDetails getUserByUid(Long uid) throws UsernameNotFoundException;
     UserEntity getUserByUsername(String username) throws UsernameNotFoundException;
     UserEntity createUser(UserDto userDto) throws Exception;
 }

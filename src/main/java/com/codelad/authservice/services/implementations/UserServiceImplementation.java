@@ -34,7 +34,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public UserDetails getUserByUid(Integer uid) throws UsernameNotFoundException {
+    public UserDetails getUserByUid(Long uid) throws UsernameNotFoundException {
         return userRepository.findByUid(uid).orElseThrow(() -> new UsernameNotFoundException("User not found in DB"));
     }
 
@@ -46,7 +46,6 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserEntity createUser(UserDto userDto) throws Exception{
         try {
-            System.out.println(userDto.getVerificationStatus());
             userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
             UserEntity userEntity = userUtils.userDtoToUserEntity(userDto);
             return userRepository.save(userEntity);
