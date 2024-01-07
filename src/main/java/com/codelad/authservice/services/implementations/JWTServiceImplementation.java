@@ -32,7 +32,7 @@ public class JWTServiceImplementation implements JWTService {
     }
 
     private String generateJwtTokenWithClaims(Map<String, Object> claims, UserDetails userDetails){
-        return Jwts.builder().claims(claims).subject(((UserEntity) userDetails).getUuid().toString()).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + expirationSeconds)).signWith(getJwtSigningKey(), SignatureAlgorithm.HS256).compact();
+        return Jwts.builder().claims(claims).subject(((UserEntity) userDetails).getUid().toString()).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + expirationSeconds)).signWith(getJwtSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
     private Claims extractAllClaims(String token){
@@ -53,8 +53,8 @@ public class JWTServiceImplementation implements JWTService {
     }
 
     @Override
-    public UUID extractUuid(String token){
-        return UUID.fromString(extractClaims(token, Claims::getSubject));
+    public Integer extractUid(String token){
+        return Integer.parseInt(extractClaims(token, Claims::getSubject));
     }
 
     @Override
@@ -64,8 +64,8 @@ public class JWTServiceImplementation implements JWTService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails){
-        final UUID uidFromToken = extractUuid(token);
-        return uidFromToken.toString().equals(((UserEntity) userDetails).getUuid().toString()) && !isExpired(token);
+        final Integer uidFromToken = extractUid(token);
+        return uidFromToken.toString().equals(((UserEntity) userDetails).getUid().toString()) && !isExpired(token);
     }
 
 }

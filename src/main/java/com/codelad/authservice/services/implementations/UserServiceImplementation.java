@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -35,8 +34,8 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public UserDetails getUserByUid(UUID uid) throws UsernameNotFoundException {
-        return userRepository.findByUuid(uid).orElseThrow(() -> new UsernameNotFoundException("User not found in DB"));
+    public UserDetails getUserByUid(Integer uid) throws UsernameNotFoundException {
+        return userRepository.findByUid(uid).orElseThrow(() -> new UsernameNotFoundException("User not found in DB"));
     }
 
     @Override

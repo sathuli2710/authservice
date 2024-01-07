@@ -11,6 +11,6 @@ public class UserUtils {
     }
 
     public UserDto userEntityToUserDto(UserEntity userEntity){
-        return UserDto.builder().id(userEntity.getId()).uuid(userEntity.getUuid()).username(userEntity.getUsername()).email(userEntity.getEmail()).password(userEntity.getPassword()).firstName(userEntity.getFirstName()).middleName(userEntity.getMiddleName()).lastName(userEntity.getLastName()).phoneNumber(userEntity.getPhoneNumber()).verificationStatus(userEntity.getVerificationStatus()).build();
+        return UserDto.builder().uid(userEntity.getUid()).username(userEntity.getUsername()).email(userEntity.getEmail()).password(userEntity.getPassword()).firstName(userEntity.getFirstName()).middleName(userEntity.getMiddleName()).lastName(userEntity.getLastName()).phoneNumber(userEntity.getPhoneNumber()).verificationStatus(userEntity.getVerificationStatus()).build();
     }
 }

@@ -18,14 +18,13 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SequenceGenerator(name="users_sequence", initialValue = 1, allocationSize = 1)
 @Entity
 @Table(name="users")
 public class UserEntity implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-    @Column(updatable = false, unique = true)
-    private UUID uuid;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="users_sequence")
+    private Integer uid;
     @Column(unique = true, nullable = false)
     private String username;
     @Column(unique = true, nullable = false)
@@ -50,7 +49,7 @@ public class UserEntity implements UserDetails {
 
     @PrePersist
     public void setDefaultValues(){
-        uuid = UUID.randomUUID();
+//        uuid = UUID.randomUUID();
         if(Objects.isNull(verificationStatus)){
             verificationStatus = VerificationStatus.not_verified;
         }
@@ -64,7 +63,6 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println(List.of(new SimpleGrantedAuthority("ADMIN")).toString());
         return Collections.emptyList();
     }
 

@@ -12,8 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private Long id;
-    private UUID uuid;
+    private Integer uid;
     @NotBlank(message = "username should be passed")
     @NotNull(message = "username cannot be empty")
     private String username;
