@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth/api/v1/")
+@RequestMapping("/api/v1/auth/")
 public class AuthenticationController {
 
     @Autowired

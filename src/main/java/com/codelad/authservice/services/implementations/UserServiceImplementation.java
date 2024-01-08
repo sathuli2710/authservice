@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserServiceImplementation implements UserService {
     @Autowired
@@ -52,5 +55,15 @@ public class UserServiceImplementation implements UserService {
         } catch (Exception e) {
             throw new Exception("Could not create User in DB");
         }
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() throws Exception {
+        List<UserEntity> allUsers = userRepository.findAll();
+        List<UserDto> allUsersDto = new ArrayList<>();
+        for(UserEntity user : allUsers){
+            allUsersDto.add(userUtils.userEntityToUserDto(user));
+        }
+        return allUsersDto;
     }
 }
