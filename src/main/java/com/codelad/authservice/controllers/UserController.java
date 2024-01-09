@@ -4,6 +4,7 @@ import com.codelad.authservice.dtos.GenericResponseDto;
 import com.codelad.authservice.dtos.UserDto;
 import com.codelad.authservice.entities.UserEntity;
 import com.codelad.authservice.services.UserService;
+import com.codelad.authservice.utils.GlobalUtils;
 import com.codelad.authservice.utils.UserUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,16 @@ public class UserController {
     @Autowired
     UserUtils userUtils;
 
+    @Autowired
+    GlobalUtils globalUtils;
+
     @GetMapping("{uid}")
     public ResponseEntity<GenericResponseDto<?>> getUserByUid(@NotNull @PathVariable String uid){
         try{
             UserEntity user = (UserEntity) userService.getUserByUid(Long.parseLong(uid));
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", userUtils.userEntityToUserDto(user), null), HttpStatus.OK);
+            return globalUtils.generateSuccessResponse(HttpStatus.OK, userUtils.userEntityToUserDto(user));
         }catch(UsernameNotFoundException e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Couldn't find the user"), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, "Couldn't find the user");
         }
     }
 
@@ -35,9 +39,9 @@ public class UserController {
     public ResponseEntity<GenericResponseDto<?>> getUserByUsername(@NotNull @RequestParam String username){
         try{
             UserEntity user = (UserEntity) userService.getUserByUsername(username);
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", userUtils.userEntityToUserDto(user), null), HttpStatus.OK);
+            return globalUtils.generateSuccessResponse(HttpStatus.OK, userUtils.userEntityToUserDto(user));
         }catch(UsernameNotFoundException e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Couldn't find the user"), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, "Couldn't find the user");
         }
     }
 }

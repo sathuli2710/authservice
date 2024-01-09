@@ -3,6 +3,7 @@ package com.codelad.authservice.controllers;
 import com.codelad.authservice.dtos.GenericResponseDto;
 import com.codelad.authservice.entities.RefreshTokenEntity;
 import com.codelad.authservice.services.RefreshTokenService;
+import com.codelad.authservice.utils.GlobalUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,17 +21,20 @@ public class RefreshTokenController {
     @Autowired
     RefreshTokenService refreshTokenService;
 
+    @Autowired
+    GlobalUtils globalUtils;
+
     @GetMapping("{username}")
     public ResponseEntity<GenericResponseDto<?>> getRefreshTokenByUsername(@NotNull @PathVariable String username){
         try{
             Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenService.findByUsername(username);
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", refreshTokenEntity.get(), null), HttpStatus.OK);
+            return globalUtils.generateSuccessResponse(HttpStatus.OK, refreshTokenEntity.get());
         }
         catch (NoSuchElementException e){
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.NOT_FOUND.value(), "ERROR", null, "This user does not have any refresh token"), HttpStatus.NOT_FOUND);
+            return globalUtils.generateErrorResponse(HttpStatus.NOT_FOUND, "This user does not have any refresh token");
         }
         catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.NOT_FOUND.value(), "ERROR", null, e.getMessage()), HttpStatus.NOT_FOUND);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
@@ -40,16 +44,16 @@ public class RefreshTokenController {
             Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenService.findByToken(token);
             boolean isValid = refreshTokenService.isValidRefreshToken(refreshTokenEntity.get());
             if(isValid){
-                return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", "It is a valid token", null), HttpStatus.OK);
+                return globalUtils.generateSuccessResponse(HttpStatus.OK, "It is a valid token");
             }else{
-                return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.NOT_FOUND.value(), "ERROR", null, "Token is expired/not_valid"), HttpStatus.NOT_FOUND);
+                return globalUtils.generateErrorResponse(HttpStatus.NOT_FOUND, "Token is expired/not_valid");
             }
         }
         catch (NoSuchElementException e){
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.NOT_FOUND.value(), "ERROR", null, "Token does not exists"), HttpStatus.NOT_FOUND);
+            return globalUtils.generateErrorResponse(HttpStatus.NOT_FOUND, "Token does not exists");
         }
         catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, e.getMessage()), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST,  e.getMessage());
         }
     }
 
@@ -57,13 +61,13 @@ public class RefreshTokenController {
     public ResponseEntity<GenericResponseDto<?>> createTokenByUsername(@NotNull @PathVariable String username){
         try {
             RefreshTokenEntity refreshTokenEntity = refreshTokenService.createRefreshToken(username);
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", refreshTokenEntity, null), HttpStatus.OK);
+            return globalUtils.generateSuccessResponse(HttpStatus.CREATED, refreshTokenEntity);
         }
         catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Cannot create multiple refresh tokens for the same user"), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST,  "Cannot create multiple refresh tokens for the same user");
         }
         catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, e.getMessage()), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST,  e.getMessage());
         }
     }
 
@@ -73,13 +77,13 @@ public class RefreshTokenController {
             Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenService.findByUsername(username);
            if(refreshTokenEntity.isPresent()){
                refreshTokenService.deleteByUsername(username);
-               return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", "Token is deleted successfully", null), HttpStatus.OK);
+               return globalUtils.generateSuccessResponse(HttpStatus.OK, "Token is deleted successfully");
            }
            else{
-               return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.NOT_FOUND.value(), "ERROR", null, "There is not refresh token for this username"), HttpStatus.NOT_FOUND);
+               return globalUtils.generateErrorResponse(HttpStatus.NOT_FOUND,  "There is not refresh token for this username");
            }
         }catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, e.getMessage()), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST,  e.getMessage());
         }
     }
 }

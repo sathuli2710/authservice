@@ -5,6 +5,7 @@ import com.codelad.authservice.dtos.GenericResponseDto;
 import com.codelad.authservice.dtos.SigninDto;
 import com.codelad.authservice.dtos.UserDto;
 import com.codelad.authservice.services.AuthenticationService;
+import com.codelad.authservice.utils.GlobalUtils;
 import com.codelad.authservice.utils.StringToVerificationStatus;
 import com.codelad.authservice.utils.VerificationStatus;
 import jakarta.validation.Valid;
@@ -26,6 +27,9 @@ public class AuthenticationController {
     @Autowired
     AuthenticationService authenticationService;
 
+    @Autowired
+    GlobalUtils globalUtils;
+
     @InitBinder
     public void initBinder(WebDataBinder binder){
         binder.registerCustomEditor(VerificationStatus.class, new StringToVerificationStatus());
@@ -39,13 +43,13 @@ public class AuthenticationController {
             for(ObjectError error: bindingResult.getAllErrors()){
                 errorMap.put(error.getObjectName(), error.getDefaultMessage());
             }
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, errorMap), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, errorMap);
         }
         try{
             AuthenticationResponse authenticationResponse = authenticationService.signup(userDto);
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.CREATED.value(), "SUCCESS", authenticationResponse, null), HttpStatus.CREATED);
+            return globalUtils.generateSuccessResponse(HttpStatus.CREATED, authenticationResponse);
         } catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, e.getMessage()), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
@@ -56,13 +60,12 @@ public class AuthenticationController {
             for(ObjectError error: bindingResult.getAllErrors()){
                 errorMap.put(error.getObjectName(), error.getDefaultMessage());
             }
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, errorMap), HttpStatus.BAD_REQUEST);
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, errorMap);
         }
         try{
             AuthenticationResponse authenticationResponse = authenticationService.signin(signinDto);
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", authenticationResponse, null), HttpStatus.OK);
+            return globalUtils.generateSuccessResponse(HttpStatus.OK, authenticationResponse);
         } catch (Exception e) {
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.UNAUTHORIZED.value(), "ERROR", null, e.getMessage()), HttpStatus.UNAUTHORIZED);
-        }
+            return globalUtils.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());        }
     }
 }
