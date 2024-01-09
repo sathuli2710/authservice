@@ -10,12 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/users/")
@@ -26,21 +21,20 @@ public class UserController {
     @Autowired
     UserUtils userUtils;
 
-    @GetMapping
-    public ResponseEntity<GenericResponseDto<?>> getAllUsers(){
-        try{
-            List<UserDto> allUsers = userService.getAllUsers();
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", allUsers, null), HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Couldn't fetch all the users"), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping("{uid}")
     public ResponseEntity<GenericResponseDto<?>> getUserByUid(@NotNull @PathVariable String uid){
         try{
             UserEntity user = (UserEntity) userService.getUserByUid(Long.parseLong(uid));
+            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", userUtils.userEntityToUserDto(user), null), HttpStatus.OK);
+        }catch(UsernameNotFoundException e) {
+            return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Couldn't find the user"), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<GenericResponseDto<?>> getUserByUsername(@NotNull @RequestParam String username){
+        try{
+            UserEntity user = (UserEntity) userService.getUserByUsername(username);
             return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.OK.value(), "SUCCESS", userUtils.userEntityToUserDto(user), null), HttpStatus.OK);
         }catch(UsernameNotFoundException e) {
             return new ResponseEntity<>(new GenericResponseDto<>(HttpStatus.BAD_REQUEST.value(), "ERROR", null, "Couldn't find the user"), HttpStatus.BAD_REQUEST);

@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,15 +33,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final Long uid;
+        final String username;
         if(!StringUtils.hasLength(authHeader) || !StringUtils.startsWithIgnoreCase(authHeader, "Bearer")) {
             filterChain.doFilter(request, response);
             return;
         }
         jwt = authHeader.substring(7);
-        uid = jwtService.extractUid(jwt);
-        if(StringUtils.hasLength(uid.toString()) && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userService.getUserByUid(uid);
+        username = jwtService.extractUsername(jwt);
+        if(StringUtils.hasLength(username) && SecurityContextHolder.getContext().getAuthentication() == null){
+            UserDetails userDetails = userService.getUserByUsername(username);
             if(jwtService.isTokenValid(jwt, userDetails)) {
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

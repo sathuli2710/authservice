@@ -21,7 +21,6 @@ public class CustomUidSequenceGenerator implements IdentifierGenerator {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String formattedDateTimeStr = currentDateTime.format(formatter);
         int innerSequenceNextValue = userRepository.getInnerSequenceNextValue();
-        System.out.println(innerSequenceNextValue);
         formattedDateTimeStr += innerSequenceNextValue;
         return Long.parseLong(formattedDateTimeStr);
     }

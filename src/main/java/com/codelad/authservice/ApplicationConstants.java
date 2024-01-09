@@ -1,6 +1,6 @@
 package com.codelad.authservice;
 
 public class ApplicationConstants {
-    public static short NOT_VERIFIED = 0;
-    public static short VERIFIED = 1;
+    public static Long JWT_ACCESS_TOKEN_EXPIRY_MILLI_SECONDS = 15*1000*60L;
+    public static Long JWT_REFRESH_TOKEN_EXPIRY_MILLI_SECONDS = 24*60*1000*60L;
 }

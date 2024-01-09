@@ -1,12 +1,14 @@
 package com.codelad.authservice.services.implementations;
 
-import com.codelad.authservice.entities.UserEntity;
+import com.codelad.authservice.ApplicationConstants;
 import com.codelad.authservice.services.JWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,16 +17,14 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 @Service
 public class JWTServiceImplementation implements JWTService {
+    private final Logger logger = LoggerFactory.getLogger(JWTServiceImplementation.class);
 
     @Value("${spring.token.signing.key}")
     private String jwtTokenSigningKey;
-    @Value("${spring.token.expiration}")
-    private Long expirationSeconds;
 
     private Key getJwtSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtTokenSigningKey);
@@ -32,7 +32,7 @@ public class JWTServiceImplementation implements JWTService {
     }
 
     private String generateJwtTokenWithClaims(Map<String, Object> claims, UserDetails userDetails){
-        return Jwts.builder().claims(claims).subject(((UserEntity) userDetails).getUid().toString()).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + expirationSeconds)).signWith(getJwtSigningKey(), SignatureAlgorithm.HS256).compact();
+        return Jwts.builder().claims(claims).subject(userDetails.getUsername()).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + ApplicationConstants.JWT_ACCESS_TOKEN_EXPIRY_MILLI_SECONDS)).signWith(getJwtSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
     private Claims extractAllClaims(String token){
@@ -53,8 +53,8 @@ public class JWTServiceImplementation implements JWTService {
     }
 
     @Override
-    public Long extractUid(String token){
-        return Long.parseLong(extractClaims(token, Claims::getSubject));
+    public String extractUsername(String token){
+        return extractClaims(token, Claims::getSubject);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class JWTServiceImplementation implements JWTService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails){
-        final Long uidFromToken = extractUid(token);
-        return uidFromToken.toString().equals(((UserEntity) userDetails).getUid().toString()) && !isExpired(token);
+        final String uidFromToken = extractUsername(token);
+        return uidFromToken.equals(userDetails.getUsername()) && !isExpired(token);
     }
 
 }
